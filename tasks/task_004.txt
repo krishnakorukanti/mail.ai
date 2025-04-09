@@ -1,0 +1,323 @@
+# Task ID: 4
+# Title: Build Gmail API Integration for Email Sync
+# Status: pending
+# Dependencies: 3
+# Priority: high
+# Description: Develop the integration with Gmail API to synchronize and fetch user emails for initial and incremental processing.
+# Details:
+1. Install Gmail API client: `npm i googleapis`
+2. Create GmailService class for API interactions
+3. Implement OAuth2 token exchange for Gmail API access
+4. Create methods for batch fetching emails (pagination handling)
+5. Implement incremental sync using history ID
+6. Create webhook endpoint for real-time updates
+7. Store email metadata in PostgreSQL
+8. Implement error handling and retry logic
+9. Add logging for API interactions
+
+# Test Strategy:
+Test email synchronization with test accounts. Verify correct metadata storage in the database. Test incremental sync by adding new emails. Validate webhook functionality with Gmail push notifications.
+
+# Subtasks:
+## 1. Set up Gmail API Client and OAuth2 Authentication [pending]
+### Dependencies: None
+### Description: Create the foundation for Gmail API integration by setting up the API client and implementing OAuth2 authentication flow for secure user authorization.
+### Details:
+1. Install required packages: `npm i googleapis google-auth-library`
+2. Create a `GmailService` class with constructor that accepts OAuth credentials
+3. Implement OAuth2 client setup using the googleapis library:
+   ```javascript
+   const {google} = require('googleapis');
+   const OAuth2 = google.auth.OAuth2;
+   
+   class GmailService {
+     constructor(clientId, clientSecret, redirectUri) {
+       this.oAuth2Client = new OAuth2(clientId, clientSecret, redirectUri);
+       this.gmail = null;
+     }
+     
+     generateAuthUrl(scopes) {
+       return this.oAuth2Client.generateAuthUrl({
+         access_type: 'offline',
+         prompt: 'consent',
+         scope: scopes
+       });
+     }
+     
+     async getTokens(code) {
+       const {tokens} = await this.oAuth2Client.getToken(code);
+       return tokens;
+     }
+     
+     setCredentials(tokens) {
+       this.oAuth2Client.setCredentials(tokens);
+       this.gmail = google.gmail({version: 'v1', auth: this.oAuth2Client});
+     }
+   }
+   ```
+4. Create a token refresh mechanism to handle expiring access tokens
+5. Implement secure token storage in PostgreSQL with encryption
+6. Add a method to verify the connection is working:
+   ```javascript
+   async verifyConnection() {
+     try {
+       const response = await this.gmail.users.getProfile({userId: 'me'});
+       return response.data;
+     } catch (error) {
+       throw new Error(`Gmail API connection failed: ${error.message}`);
+     }
+   }
+   ```
+7. Add comprehensive error handling with proper logging
+8. Create unit tests using mocked responses for OAuth flow testing
+
+## 2. Implement Email Fetching with Pagination and Batch Processing [pending]
+### Dependencies: 4.1
+### Description: Develop robust methods to fetch emails from Gmail API with proper pagination handling, batch processing, and efficient API usage to minimize quota consumption.
+### Details:
+1. Extend the `GmailService` class with methods for fetching emails:
+   ```javascript
+   async listMessages(query = '', maxResults = 100, pageToken = null) {
+     try {
+       const response = await this.gmail.users.messages.list({
+         userId: 'me',
+         q: query,
+         maxResults,
+         pageToken
+       });
+       
+       return {
+         messages: response.data.messages || [],
+         nextPageToken: response.data.nextPageToken,
+         resultSizeEstimate: response.data.resultSizeEstimate,
+         historyId: response.data.historyId
+       };
+     } catch (error) {
+       this.handleApiError(error, 'listMessages');
+     }
+   }
+   
+   async getMessageBatch(messageIds) {
+     const batchSize = 10; // Optimize based on testing
+     const messages = [];
+     
+     for (let i = 0; i < messageIds.length; i += batchSize) {
+       const batch = messageIds.slice(i, i + batchSize);
+       const promises = batch.map(id => 
+         this.gmail.users.messages.get({
+           userId: 'me',
+           id,
+           format: 'full'
+         })
+       );
+       
+       const results = await Promise.allSettled(promises);
+       
+       // Process results and handle any individual failures
+       for (const result of results) {
+         if (result.status === 'fulfilled') {
+           messages.push(result.value.data);
+         } else {
+           console.error(`Failed to fetch message: ${result.reason}`);
+           // Implement retry logic here
+         }
+       }
+       
+       // Apply exponential backoff to avoid rate limiting
+       if (i + batchSize < messageIds.length) {
+         await new Promise(resolve => setTimeout(resolve, 100));
+       }
+     }
+     
+     return messages;
+   }
+   ```
+2. Implement a complete pagination handler for large mailboxes:
+   ```javascript
+   async fetchAllMessages(query = '', batchSize = 100) {
+     let pageToken = null;
+     let allMessages = [];
+     let latestHistoryId = null;
+     
+     do {
+       const result = await this.listMessages(query, batchSize, pageToken);
+       if (result.messages && result.messages.length > 0) {
+         allMessages = allMessages.concat(result.messages);
+       }
+       
+       pageToken = result.nextPageToken;
+       latestHistoryId = result.historyId || latestHistoryId;
+     } while (pageToken);
+     
+     return { messages: allMessages, historyId: latestHistoryId };
+   }
+   ```
+3. Add retry logic with exponential backoff for transient errors:
+   ```javascript
+   async handleApiError(error, operation) {
+     const retryableStatusCodes = [429, 500, 502, 503, 504];
+     if (error.response && retryableStatusCodes.includes(error.response.status)) {
+       // Implement retry with exponential backoff
+     }
+     throw new Error(`Gmail API ${operation} failed: ${error.message}`);
+   }
+   ```
+4. Implement quota usage monitoring and throttling:
+   ```javascript
+   trackQuotaUsage(response) {
+     // Extract X-Quota-Used header if available
+     const quotaUsed = response?.headers?.['x-quota-used'];
+     if (quotaUsed) {
+       // Log or store quota usage for monitoring
+     }
+   }
+   ```
+5. Create integration tests that verify pagination and batch processing with sample data
+
+## 3. Implement Incremental Sync and Email Storage [pending]
+### Dependencies: 4.1, 4.2
+### Description: Create a system for incremental email synchronization using history IDs, set up webhook endpoints for real-time updates, and implement database storage for email metadata.
+### Details:
+1. Extend the `GmailService` class with methods for incremental sync:
+   ```javascript
+   async getHistoryList(startHistoryId, historyTypes = ['messageAdded', 'messageDeleted', 'labelAdded', 'labelRemoved']) {
+     try {
+       const response = await this.gmail.users.history.list({
+         userId: 'me',
+         startHistoryId,
+         historyTypes
+       });
+       
+       return {
+         history: response.data.history || [],
+         historyId: response.data.historyId
+       };
+     } catch (error) {
+       // Handle 404 errors specially - they indicate the historyId is too old
+       if (error.response && error.response.status === 404) {
+         return { invalidHistoryId: true };
+       }
+       this.handleApiError(error, 'getHistoryList');
+     }
+   }
+   ```
+2. Create a database schema for storing email metadata:
+   ```sql
+   CREATE TABLE user_email_sync (
+     user_id UUID NOT NULL REFERENCES users(id),
+     history_id TEXT NOT NULL,
+     last_sync_time TIMESTAMP WITH TIME ZONE NOT NULL,
+     PRIMARY KEY (user_id)
+   );
+   
+   CREATE TABLE emails (
+     id TEXT NOT NULL,
+     user_id UUID NOT NULL REFERENCES users(id),
+     thread_id TEXT NOT NULL,
+     snippet TEXT,
+     subject TEXT,
+     from_address TEXT,
+     to_addresses TEXT[],
+     cc_addresses TEXT[],
+     received_at TIMESTAMP WITH TIME ZONE,
+     labels TEXT[],
+     is_unread BOOLEAN DEFAULT FALSE,
+     has_attachments BOOLEAN DEFAULT FALSE,
+     raw_data JSONB,
+     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+     PRIMARY KEY (id, user_id)
+   );
+   
+   CREATE INDEX emails_user_id_idx ON emails(user_id);
+   CREATE INDEX emails_thread_id_idx ON emails(thread_id);
+   ```
+3. Implement email processing and storage functions:
+   ```javascript
+   async processAndStoreEmail(message) {
+     // Extract relevant metadata from the message object
+     const headers = this.extractHeaders(message.payload.headers);
+     const emailData = {
+       id: message.id,
+       threadId: message.threadId,
+       snippet: message.snippet,
+       subject: headers.subject,
+       fromAddress: headers.from,
+       toAddresses: headers.to?.split(',').map(addr => addr.trim()) || [],
+       ccAddresses: headers.cc?.split(',').map(addr => addr.trim()) || [],
+       receivedAt: new Date(parseInt(message.internalDate)),
+       labels: message.labelIds || [],
+       isUnread: message.labelIds?.includes('UNREAD') || false,
+       hasAttachments: this.checkForAttachments(message.payload),
+       rawData: message
+     };
+     
+     // Store in database
+     await this.storeEmailInDatabase(emailData);
+     return emailData;
+   }
+   ```
+4. Implement a webhook endpoint for real-time updates:
+   ```javascript
+   // Express route handler
+   app.post('/api/gmail/webhook', async (req, res) => {
+     // Verify the request is from Google
+     // Process the notification
+     const notification = req.body;
+     if (notification.message && notification.message.data) {
+       const data = JSON.parse(Buffer.from(notification.message.data, 'base64').toString());
+       // Trigger incremental sync for the affected user
+       await triggerIncrementalSync(data.emailAddress);
+     }
+     res.status(200).send('OK');
+   });
+   ```
+5. Implement a complete incremental sync process:
+   ```javascript
+   async performIncrementalSync(userId) {
+     // Get the last known historyId for this user
+     const syncData = await this.getUserSyncData(userId);
+     
+     if (!syncData.historyId) {
+       // No history ID - need to do a full sync
+       return this.performFullSync(userId);
+     }
+     
+     const result = await this.getHistoryList(syncData.historyId);
+     
+     if (result.invalidHistoryId) {
+       // History ID is too old, fall back to full sync
+       return this.performFullSync(userId);
+     }
+     
+     // Process history changes
+     for (const historyItem of result.history) {
+       await this.processHistoryItem(historyItem, userId);
+     }
+     
+     // Update the stored historyId
+     await this.updateUserSyncData(userId, result.historyId);
+     
+     return {
+       success: true,
+       historyId: result.historyId,
+       changesProcessed: result.history.length
+     };
+   }
+   ```
+6. Add comprehensive logging for all API interactions:
+   ```javascript
+   async logApiInteraction(method, params, result, error = null) {
+     // Store logs in database or send to logging service
+     await db.apiLogs.create({
+       userId: this.userId,
+       method,
+       params: JSON.stringify(params),
+       success: !error,
+       errorMessage: error?.message,
+       timestamp: new Date()
+     });
+   }
+   ```
+7. Implement integration tests for incremental sync and database storage
+

@@ -1,0 +1,472 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup AdonisJS Project with TypeScript",
+      "description": "Initialize the AdonisJS 5.x project with TypeScript, Node.js 18+, and configure the basic project structure for the mail.ai backend.",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "details": "1. Install AdonisJS CLI: `npm i -g @adonisjs/cli`\n2. Create new project: `npx create-adonis-ts-app mail-ai-backend`\n3. Configure TypeScript settings in tsconfig.json\n4. Setup environment variables (.env) with necessary configurations\n5. Implement folder structure for controllers, models, services, and middleware\n6. Setup linting and code formatting (ESLint, Prettier)\n7. Initialize Git repository with proper .gitignore",
+      "testStrategy": "Verify project setup by running the server and confirming it starts without errors. Run linting checks to ensure code style consistency.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Initialize AdonisJS project with TypeScript and Node.js 18+",
+          "description": "Set up a new AdonisJS 5.x project with TypeScript support using the official CLI tools and configure the basic application settings.",
+          "dependencies": [],
+          "details": "1. Verify Node.js 18+ is installed by running `node -v`\n2. Create a new AdonisJS project with TypeScript using the command: `npm init adonis-ts-app@latest mail-ai-backend`\n3. During project initialization:\n   - Select 'api' as the project structure for a REST API server\n   - Enable ESLint and Prettier when prompted\n   - Skip Webpack Encore unless frontend asset compilation is needed\n4. Navigate to the project directory: `cd mail-ai-backend`\n5. Start the development server to verify setup: `node ace serve --watch`\n6. Verify the server is running by accessing http://localhost:3333\n7. Test the TypeScript compilation by making a small change to a TypeScript file and ensuring it recompiles correctly\n8. Document project initialization details in README.md",
+          "status": "pending",
+          "parentTaskId": 1
+        },
+        {
+          "id": 2,
+          "title": "Configure TypeScript settings and project structure",
+          "description": "Customize TypeScript configuration for optimal development experience and establish the folder structure following AdonisJS best practices.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Review and adjust the auto-generated tsconfig.json file with the following settings:\n   - Set `target` to `es2020` or higher for Node.js 18+ compatibility\n   - Ensure `strict` is set to `true` for type safety\n   - Verify path aliases are correctly configured for imports\n2. Create additional folders for better organization:\n   - `app/Services/` for business logic services\n   - `app/Validators/` for request validation\n   - `app/Interfaces/` for TypeScript interfaces\n   - `app/Utils/` for utility functions\n3. Create a basic controller to test the structure: `node ace make:controller Api/Test`\n4. Create a basic route in `start/routes.ts` that uses the test controller\n5. Implement proper error handling in `app/Exceptions/Handler.ts`\n6. Setup custom TypeScript types in `contracts` directory for application-specific types\n7. Test the project structure by running: `node ace list:routes` to verify routes are registered correctly",
+          "status": "pending",
+          "parentTaskId": 1
+        },
+        {
+          "id": 3,
+          "title": "Setup environment configuration and initialize Git repository",
+          "description": "Configure environment variables, setup linting/formatting tools, and initialize Git with proper ignore patterns for a production-ready development workflow.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Copy `.env.example` to `.env` and configure essential environment variables:\n   - `PORT=3333`\n   - `HOST=0.0.0.0`\n   - `NODE_ENV=development`\n   - `APP_KEY` (generate with `node ace generate:key`)\n   - `DB_CONNECTION=sqlite` (for development)\n2. Create `.env.test` for testing environment configuration\n3. Configure ESLint and Prettier:\n   - Review and customize `.eslintrc.json` for TypeScript rules\n   - Create `.prettierrc` with project formatting standards\n   - Add lint and format scripts to package.json:\n     ```\n     \"lint\": \"eslint . --ext=.ts\",\n     \"format\": \"prettier --write .\"\n     ```\n4. Initialize Git repository: `git init`\n5. Create a comprehensive `.gitignore` file including:\n   - `node_modules/`\n   - `.env`\n   - `.env.test`\n   - `build/`\n   - `tmp/`\n   - `coverage/`\n   - `.DS_Store`\n   - Editor-specific files (e.g., `.vscode/`)\n6. Create a `.editorconfig` file for consistent coding style across editors\n7. Make an initial commit: `git add . && git commit -m \"Initial project setup\"`\n8. Test the environment configuration by running: `node ace serve --watch` and verifying environment variables are correctly loaded",
+          "status": "pending",
+          "parentTaskId": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Configure Database Connections and Migrations",
+      "description": "Set up PostgreSQL and ChromaDB connections, create database schemas, and implement migrations for all required tables.",
+      "status": "pending",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "1. Install PostgreSQL provider: `npm i @adonisjs/lucid`\n2. Configure PostgreSQL connection in config/database.ts\n3. Install ChromaDB client: `npm i chromadb`\n4. Create ChromaDB service wrapper\n5. Create migrations for all PostgreSQL tables (users, email_metadata, processing_records, notifications, user_settings, email_threads, classification_rules)\n6. Implement models with relationships\n7. Create initialization script for ChromaDB collections (email_embeddings, context_vectors, semantic_indexes)\n8. Setup database seeders for testing",
+      "testStrategy": "Run migrations and verify tables are created correctly. Test connections to both databases with simple queries. Run seeders to populate test data.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Set up PostgreSQL Docker container and connection configuration",
+          "description": "Create Docker configuration for PostgreSQL, configure connection settings in the application, and implement connection pooling with proper environment variable management.",
+          "dependencies": [],
+          "details": "1. Create a Docker configuration for PostgreSQL in `docker-compose.yml`:\n   - Use the official PostgreSQL image (postgres:14-alpine for smaller size)\n   - Configure environment variables (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB)\n   - Set up volume mapping for data persistence (`./pgdata:/var/lib/postgresql/data`)\n   - Expose the standard port (5432) with proper network configuration\n\n2. Install the AdonisJS Lucid provider: `npm i @adonisjs/lucid`\n\n3. Configure the PostgreSQL connection in `config/database.ts`:\n   - Set up environment variables in `.env` file (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)\n   - Implement connection pooling with appropriate settings (min: 2, max: 20)\n   - Add SSL configuration for production environments\n   - Configure query timeout and reconnection strategies\n\n4. Create a database initialization script in `docker-entrypoint-initdb.d/` to ensure database and extensions are created on container startup\n\n5. Test the connection with a health check endpoint in the application\n\nTesting approach:\n- Verify container starts successfully with `docker-compose up postgres`\n- Test connection from application with `node ace db:ping`\n- Implement and run a simple query test to validate connection settings",
+          "status": "pending",
+          "parentTaskId": 2
+        },
+        {
+          "id": 2,
+          "title": "Create PostgreSQL migrations and models with relationships",
+          "description": "Design and implement database schema migrations for all required tables with proper relationships, constraints, and indexes.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create database migrations for all required tables using AdonisJS migration system:\n   - Users table: `node ace make:migration users`\n     - Include columns: id, email, password_hash, name, role, created_at, updated_at\n     - Add appropriate indexes on email and role fields\n   - Email metadata table: `node ace make:migration email_metadata`\n     - Include columns: id, user_id (foreign key), subject, sender, recipients, date, content_preview, created_at, updated_at\n     - Add indexes on user_id, date, and sender\n   - Processing records table: `node ace make:migration processing_records`\n     - Track processing status of emails\n   - Notifications table: `node ace make:migration notifications`\n   - User settings table: `node ace make:migration user_settings`\n   - Email threads table: `node ace make:migration email_threads`\n   - Classification rules table: `node ace make:migration classification_rules`\n\n2. Implement models with relationships using Lucid ORM:\n   - Create User model with relationships to emails, settings, etc.\n   - Create EmailMetadata model with relationship to User\n   - Create remaining models with proper relationships\n   - Implement relationship methods (hasMany, belongsTo, etc.)\n\n3. Set up database seeders for testing:\n   - Create seeders for each table with realistic test data\n   - Implement a master seeder that runs all seeders in the correct order\n\n4. Run migrations with `node ace migration:run`\n\nTesting approach:\n- Verify migrations apply successfully\n- Test model relationships with simple queries\n- Run seeders and validate data integrity",
+          "status": "pending",
+          "parentTaskId": 2
+        },
+        {
+          "id": 3,
+          "title": "Set up ChromaDB Docker container and collection initialization",
+          "description": "Configure ChromaDB in Docker, create a service wrapper for the application, and implement initialization scripts for required collections.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create Docker configuration for ChromaDB in `docker-compose.yml`:\n   - Use the official ChromaDB image\n   - Configure environment variables for authentication and settings\n   - Set up volume mapping for data persistence (`./chroma_data:/chroma/chroma_data`)\n   - Expose the API port (8000) with proper network configuration\n   - Configure health checks for container monitoring\n\n2. Install ChromaDB client: `npm i chromadb`\n\n3. Create a ChromaDB service wrapper in `app/Services/ChromaDBService.ts`:\n   - Implement connection management with retry logic\n   - Create methods for common operations (addItem, queryCollection, etc.)\n   - Add error handling and logging\n   - Implement connection pooling if supported\n\n4. Create initialization script for ChromaDB collections:\n   - Implement script to create collections on application startup:\n     - email_embeddings: Store vector embeddings of email content\n     - context_vectors: Store contextual information vectors\n     - semantic_indexes: Store semantic search indexes\n   - Add metadata schemas for each collection\n   - Configure distance metrics (cosine, euclidean, etc.) based on collection needs\n\n5. Create utility functions for vector operations:\n   - Implement functions for vector similarity search\n   - Add batch processing capabilities for efficient operations\n\nTesting approach:\n- Verify ChromaDB container starts successfully\n- Test collection creation and basic operations\n- Benchmark vector insertion and query performance",
+          "status": "pending",
+          "parentTaskId": 2
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Implement Google OAuth Authentication System",
+      "description": "Develop the authentication system with Google OAuth 2.0 integration, JWT token management, and user session handling.",
+      "status": "pending",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "1. Install auth packages: `npm i @adonisjs/auth passport passport-google-oauth20 jsonwebtoken`\n2. Configure Google OAuth provider in config/auth.ts\n3. Create AuthController with login, refresh, and logout methods\n4. Implement JWT token generation and validation\n5. Create middleware for authentication and rate limiting\n6. Setup user model with OAuth credential storage\n7. Implement token refresh mechanism\n8. Create authentication routes in start/routes.ts\n9. Add security headers and CORS configuration",
+      "testStrategy": "Test OAuth flow with a test Google account. Verify JWT token generation, validation, and refresh. Test rate limiting by making multiple requests. Ensure proper error handling for invalid credentials.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Configure Google OAuth Provider and User Model",
+          "description": "Set up the Google OAuth 2.0 provider configuration, create the necessary user model with OAuth credential storage, and implement the authentication controller for handling login flows.",
+          "dependencies": [],
+          "details": "1. Install required packages: `npm i @adonisjs/auth passport passport-google-oauth20 jsonwebtoken`\n2. Register a new project in Google Cloud Platform:\n   - Navigate to API & Services > Credentials\n   - Create OAuth 2.0 Client ID\n   - Configure Authorized Redirect URIs (e.g., `http://localhost:3333/auth/google/callback` for development)\n   - Save Client ID and Client Secret as environment variables\n3. Configure Google OAuth provider in `config/auth.ts`:\n   - Set up passport strategy with Google provider\n   - Define scopes (recommend: ['profile', 'email'])\n   - Configure callback URL\n4. Create or modify User model to store OAuth credentials:\n   - Add fields: `email`, `googleId`, `name`, `avatar`, `refreshToken`\n   - Create migration for the users table\n   - Add methods for finding users by OAuth ID\n5. Create AuthController with login method:\n   - Implement Google OAuth authentication flow\n   - Handle user creation/retrieval based on Google profile\n   - Use state parameter to prevent CSRF attacks\n6. Testing approach:\n   - Unit test User model methods\n   - Mock Google OAuth responses for controller tests\n   - Test user creation and retrieval flows",
+          "status": "pending",
+          "parentTaskId": 3
+        },
+        {
+          "id": 2,
+          "title": "Implement JWT Token Management System",
+          "description": "Build a comprehensive JWT token management system including token generation, validation, and refresh mechanisms to handle user authentication securely.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create a JWT service for token operations:\n   - Implement token generation with appropriate claims (userId, email)\n   - Set short-lived access tokens (15 minutes) and longer refresh tokens (7 days)\n   - Add token validation and payload extraction functions\n   - Use environment variables for JWT secret keys\n2. Extend AuthController with additional methods:\n   - Complete the login flow to generate and return JWT tokens\n   - Implement refresh token endpoint to issue new access tokens\n   - Create logout method to invalidate tokens\n3. Create a token blacklist mechanism:\n   - Use Redis or database to store revoked tokens\n   - Implement token rotation for refresh tokens\n   - Add checks during validation to verify tokens aren't blacklisted\n4. Implement secure token storage:\n   - Configure HTTP-only, secure cookies for tokens\n   - Add appropriate expiration and path settings\n   - Implement CSRF protection for token endpoints\n5. Testing approach:\n   - Unit test JWT service methods\n   - Test token generation, validation, and refresh flows\n   - Verify token expiration and blacklisting works correctly\n   - Test against common JWT vulnerabilities",
+          "status": "pending",
+          "parentTaskId": 3
+        },
+        {
+          "id": 3,
+          "title": "Create Authentication Middleware and Secure Routes",
+          "description": "Develop authentication middleware, implement rate limiting, set up secure routes, and add security headers to protect the authentication system.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Create authentication middleware:\n   - Implement JWT verification middleware\n   - Extract user information from valid tokens\n   - Handle authentication errors with appropriate responses\n   - Add role-based permission checks if needed\n2. Implement rate limiting middleware:\n   - Add rate limiting for authentication endpoints\n   - Configure different limits for login, refresh, and other sensitive routes\n   - Use Redis or in-memory store for tracking request counts\n3. Set up authentication routes in `start/routes.ts`:\n   - Create routes for Google OAuth login: `/auth/google`\n   - Add callback route: `/auth/google/callback`\n   - Implement token refresh route: `/auth/refresh`\n   - Add logout endpoint: `/auth/logout`\n   - Create a protected route test endpoint\n4. Configure security headers and CORS:\n   - Add Helmet.js for security headers\n   - Set up appropriate Content-Security-Policy\n   - Configure CORS with trusted origins only\n   - Implement SameSite cookie attributes\n5. Create comprehensive error handling:\n   - Handle OAuth errors gracefully\n   - Provide clear error messages for authentication failures\n   - Log security events appropriately\n6. Testing approach:\n   - Test middleware with valid and invalid tokens\n   - Verify rate limiting works as expected\n   - Use integration tests for full authentication flow\n   - Test CORS and security headers configuration",
+          "status": "pending",
+          "parentTaskId": 3
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Build Gmail API Integration for Email Sync",
+      "description": "Develop the integration with Gmail API to synchronize and fetch user emails for initial and incremental processing.",
+      "status": "pending",
+      "dependencies": [
+        3
+      ],
+      "priority": "high",
+      "details": "1. Install Gmail API client: `npm i googleapis`\n2. Create GmailService class for API interactions\n3. Implement OAuth2 token exchange for Gmail API access\n4. Create methods for batch fetching emails (pagination handling)\n5. Implement incremental sync using history ID\n6. Create webhook endpoint for real-time updates\n7. Store email metadata in PostgreSQL\n8. Implement error handling and retry logic\n9. Add logging for API interactions",
+      "testStrategy": "Test email synchronization with test accounts. Verify correct metadata storage in the database. Test incremental sync by adding new emails. Validate webhook functionality with Gmail push notifications.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Set up Gmail API Client and OAuth2 Authentication",
+          "description": "Create the foundation for Gmail API integration by setting up the API client and implementing OAuth2 authentication flow for secure user authorization.",
+          "dependencies": [],
+          "details": "1. Install required packages: `npm i googleapis google-auth-library`\n2. Create a `GmailService` class with constructor that accepts OAuth credentials\n3. Implement OAuth2 client setup using the googleapis library:\n   ```javascript\n   const {google} = require('googleapis');\n   const OAuth2 = google.auth.OAuth2;\n   \n   class GmailService {\n     constructor(clientId, clientSecret, redirectUri) {\n       this.oAuth2Client = new OAuth2(clientId, clientSecret, redirectUri);\n       this.gmail = null;\n     }\n     \n     generateAuthUrl(scopes) {\n       return this.oAuth2Client.generateAuthUrl({\n         access_type: 'offline',\n         prompt: 'consent',\n         scope: scopes\n       });\n     }\n     \n     async getTokens(code) {\n       const {tokens} = await this.oAuth2Client.getToken(code);\n       return tokens;\n     }\n     \n     setCredentials(tokens) {\n       this.oAuth2Client.setCredentials(tokens);\n       this.gmail = google.gmail({version: 'v1', auth: this.oAuth2Client});\n     }\n   }\n   ```\n4. Create a token refresh mechanism to handle expiring access tokens\n5. Implement secure token storage in PostgreSQL with encryption\n6. Add a method to verify the connection is working:\n   ```javascript\n   async verifyConnection() {\n     try {\n       const response = await this.gmail.users.getProfile({userId: 'me'});\n       return response.data;\n     } catch (error) {\n       throw new Error(`Gmail API connection failed: ${error.message}`);\n     }\n   }\n   ```\n7. Add comprehensive error handling with proper logging\n8. Create unit tests using mocked responses for OAuth flow testing",
+          "status": "pending",
+          "parentTaskId": 4
+        },
+        {
+          "id": 2,
+          "title": "Implement Email Fetching with Pagination and Batch Processing",
+          "description": "Develop robust methods to fetch emails from Gmail API with proper pagination handling, batch processing, and efficient API usage to minimize quota consumption.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Extend the `GmailService` class with methods for fetching emails:\n   ```javascript\n   async listMessages(query = '', maxResults = 100, pageToken = null) {\n     try {\n       const response = await this.gmail.users.messages.list({\n         userId: 'me',\n         q: query,\n         maxResults,\n         pageToken\n       });\n       \n       return {\n         messages: response.data.messages || [],\n         nextPageToken: response.data.nextPageToken,\n         resultSizeEstimate: response.data.resultSizeEstimate,\n         historyId: response.data.historyId\n       };\n     } catch (error) {\n       this.handleApiError(error, 'listMessages');\n     }\n   }\n   \n   async getMessageBatch(messageIds) {\n     const batchSize = 10; // Optimize based on testing\n     const messages = [];\n     \n     for (let i = 0; i < messageIds.length; i += batchSize) {\n       const batch = messageIds.slice(i, i + batchSize);\n       const promises = batch.map(id => \n         this.gmail.users.messages.get({\n           userId: 'me',\n           id,\n           format: 'full'\n         })\n       );\n       \n       const results = await Promise.allSettled(promises);\n       \n       // Process results and handle any individual failures\n       for (const result of results) {\n         if (result.status === 'fulfilled') {\n           messages.push(result.value.data);\n         } else {\n           console.error(`Failed to fetch message: ${result.reason}`);\n           // Implement retry logic here\n         }\n       }\n       \n       // Apply exponential backoff to avoid rate limiting\n       if (i + batchSize < messageIds.length) {\n         await new Promise(resolve => setTimeout(resolve, 100));\n       }\n     }\n     \n     return messages;\n   }\n   ```\n2. Implement a complete pagination handler for large mailboxes:\n   ```javascript\n   async fetchAllMessages(query = '', batchSize = 100) {\n     let pageToken = null;\n     let allMessages = [];\n     let latestHistoryId = null;\n     \n     do {\n       const result = await this.listMessages(query, batchSize, pageToken);\n       if (result.messages && result.messages.length > 0) {\n         allMessages = allMessages.concat(result.messages);\n       }\n       \n       pageToken = result.nextPageToken;\n       latestHistoryId = result.historyId || latestHistoryId;\n     } while (pageToken);\n     \n     return { messages: allMessages, historyId: latestHistoryId };\n   }\n   ```\n3. Add retry logic with exponential backoff for transient errors:\n   ```javascript\n   async handleApiError(error, operation) {\n     const retryableStatusCodes = [429, 500, 502, 503, 504];\n     if (error.response && retryableStatusCodes.includes(error.response.status)) {\n       // Implement retry with exponential backoff\n     }\n     throw new Error(`Gmail API ${operation} failed: ${error.message}`);\n   }\n   ```\n4. Implement quota usage monitoring and throttling:\n   ```javascript\n   trackQuotaUsage(response) {\n     // Extract X-Quota-Used header if available\n     const quotaUsed = response?.headers?.['x-quota-used'];\n     if (quotaUsed) {\n       // Log or store quota usage for monitoring\n     }\n   }\n   ```\n5. Create integration tests that verify pagination and batch processing with sample data",
+          "status": "pending",
+          "parentTaskId": 4
+        },
+        {
+          "id": 3,
+          "title": "Implement Incremental Sync and Email Storage",
+          "description": "Create a system for incremental email synchronization using history IDs, set up webhook endpoints for real-time updates, and implement database storage for email metadata.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Extend the `GmailService` class with methods for incremental sync:\n   ```javascript\n   async getHistoryList(startHistoryId, historyTypes = ['messageAdded', 'messageDeleted', 'labelAdded', 'labelRemoved']) {\n     try {\n       const response = await this.gmail.users.history.list({\n         userId: 'me',\n         startHistoryId,\n         historyTypes\n       });\n       \n       return {\n         history: response.data.history || [],\n         historyId: response.data.historyId\n       };\n     } catch (error) {\n       // Handle 404 errors specially - they indicate the historyId is too old\n       if (error.response && error.response.status === 404) {\n         return { invalidHistoryId: true };\n       }\n       this.handleApiError(error, 'getHistoryList');\n     }\n   }\n   ```\n2. Create a database schema for storing email metadata:\n   ```sql\n   CREATE TABLE user_email_sync (\n     user_id UUID NOT NULL REFERENCES users(id),\n     history_id TEXT NOT NULL,\n     last_sync_time TIMESTAMP WITH TIME ZONE NOT NULL,\n     PRIMARY KEY (user_id)\n   );\n   \n   CREATE TABLE emails (\n     id TEXT NOT NULL,\n     user_id UUID NOT NULL REFERENCES users(id),\n     thread_id TEXT NOT NULL,\n     snippet TEXT,\n     subject TEXT,\n     from_address TEXT,\n     to_addresses TEXT[],\n     cc_addresses TEXT[],\n     received_at TIMESTAMP WITH TIME ZONE,\n     labels TEXT[],\n     is_unread BOOLEAN DEFAULT FALSE,\n     has_attachments BOOLEAN DEFAULT FALSE,\n     raw_data JSONB,\n     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),\n     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),\n     PRIMARY KEY (id, user_id)\n   );\n   \n   CREATE INDEX emails_user_id_idx ON emails(user_id);\n   CREATE INDEX emails_thread_id_idx ON emails(thread_id);\n   ```\n3. Implement email processing and storage functions:\n   ```javascript\n   async processAndStoreEmail(message) {\n     // Extract relevant metadata from the message object\n     const headers = this.extractHeaders(message.payload.headers);\n     const emailData = {\n       id: message.id,\n       threadId: message.threadId,\n       snippet: message.snippet,\n       subject: headers.subject,\n       fromAddress: headers.from,\n       toAddresses: headers.to?.split(',').map(addr => addr.trim()) || [],\n       ccAddresses: headers.cc?.split(',').map(addr => addr.trim()) || [],\n       receivedAt: new Date(parseInt(message.internalDate)),\n       labels: message.labelIds || [],\n       isUnread: message.labelIds?.includes('UNREAD') || false,\n       hasAttachments: this.checkForAttachments(message.payload),\n       rawData: message\n     };\n     \n     // Store in database\n     await this.storeEmailInDatabase(emailData);\n     return emailData;\n   }\n   ```\n4. Implement a webhook endpoint for real-time updates:\n   ```javascript\n   // Express route handler\n   app.post('/api/gmail/webhook', async (req, res) => {\n     // Verify the request is from Google\n     // Process the notification\n     const notification = req.body;\n     if (notification.message && notification.message.data) {\n       const data = JSON.parse(Buffer.from(notification.message.data, 'base64').toString());\n       // Trigger incremental sync for the affected user\n       await triggerIncrementalSync(data.emailAddress);\n     }\n     res.status(200).send('OK');\n   });\n   ```\n5. Implement a complete incremental sync process:\n   ```javascript\n   async performIncrementalSync(userId) {\n     // Get the last known historyId for this user\n     const syncData = await this.getUserSyncData(userId);\n     \n     if (!syncData.historyId) {\n       // No history ID - need to do a full sync\n       return this.performFullSync(userId);\n     }\n     \n     const result = await this.getHistoryList(syncData.historyId);\n     \n     if (result.invalidHistoryId) {\n       // History ID is too old, fall back to full sync\n       return this.performFullSync(userId);\n     }\n     \n     // Process history changes\n     for (const historyItem of result.history) {\n       await this.processHistoryItem(historyItem, userId);\n     }\n     \n     // Update the stored historyId\n     await this.updateUserSyncData(userId, result.historyId);\n     \n     return {\n       success: true,\n       historyId: result.historyId,\n       changesProcessed: result.history.length\n     };\n   }\n   ```\n6. Add comprehensive logging for all API interactions:\n   ```javascript\n   async logApiInteraction(method, params, result, error = null) {\n     // Store logs in database or send to logging service\n     await db.apiLogs.create({\n       userId: this.userId,\n       method,\n       params: JSON.stringify(params),\n       success: !error,\n       errorMessage: error?.message,\n       timestamp: new Date()\n     });\n   }\n   ```\n7. Implement integration tests for incremental sync and database storage",
+          "status": "pending",
+          "parentTaskId": 4
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Implement Email Processing and Classification System",
+      "description": "Develop the core email processing pipeline with classification, spam detection, and vector embedding generation using LangChain and OpenAI.",
+      "status": "pending",
+      "dependencies": [
+        4
+      ],
+      "priority": "high",
+      "details": "1. Install AI packages: `npm i langchain openai`\n2. Create EmailProcessingService with classification pipeline\n3. Implement LangChain integration for email content analysis\n4. Create spam detection algorithm using OpenAI\n5. Implement priority classification based on content and sender\n6. Generate vector embeddings for email content\n7. Store embeddings in ChromaDB\n8. Update processing status in PostgreSQL\n9. Implement batch processing for historical emails\n10. Create processing queue with Bull/Redis",
+      "testStrategy": "Test classification with sample emails of various types. Validate spam detection accuracy. Measure processing time to ensure it meets the <2s requirement. Verify correct embedding storage in ChromaDB.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Set up LangChain and OpenAI integration with basic email preprocessing",
+          "description": "Install required packages and create the foundation for the email processing service with preprocessing capabilities. Implement core LangChain integration for connecting with OpenAI models and set up the initial email content cleaning pipeline.",
+          "dependencies": [],
+          "details": "1. Install required packages: `npm i langchain openai chromadb bullmq redis`\n2. Create an `EmailProcessingService` class with configuration for OpenAI API keys and model selection\n3. Implement email content preprocessing functions to:\n   - Remove HTML tags using regex\n   - Clean special characters\n   - Normalize text (lowercase, whitespace)\n   - Extract key metadata (sender, subject, recipients)\n4. Set up LangChain integration:\n   - Initialize OpenAI models through LangChain\n   - Create a basic processing chain for email content\n   - Implement error handling for API failures\n5. Create utility functions for handling different email formats\n6. Write unit tests for preprocessing functions using sample emails\n7. Document the service interface with JSDoc",
+          "status": "pending",
+          "parentTaskId": 5
+        },
+        {
+          "id": 2,
+          "title": "Implement classification pipeline with spam detection and priority scoring",
+          "description": "Build the core classification functionality using LangChain and OpenAI to analyze email content, detect spam, and assign priority scores. Create a modular pipeline that processes emails through multiple classification stages.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Extend the `EmailProcessingService` to add classification capabilities:\n   - Create a `classifyEmail` method that orchestrates the classification pipeline\n   - Implement spam detection using OpenAI's content moderation API\n   - Build priority classification based on sender reputation and content relevance\n2. Implement LangChain chains for classification:\n   - Create prompt templates for different classification tasks\n   - Set up a sequential chain for multi-stage classification\n   - Configure temperature and other model parameters for optimal results\n3. Build a spam detection module:\n   - Use OpenAI's content moderation endpoint for initial filtering\n   - Implement custom rules for known spam patterns\n   - Calculate spam confidence scores\n4. Create priority scoring algorithm:\n   - Analyze sender information (domain reputation, previous interactions)\n   - Extract urgency signals from subject and content\n   - Implement configurable priority thresholds\n5. Add database integration to store classification results in PostgreSQL\n6. Write integration tests for the classification pipeline\n7. Create a monitoring system to track classification accuracy",
+          "status": "pending",
+          "parentTaskId": 5
+        },
+        {
+          "id": 3,
+          "title": "Implement vector embedding generation and processing queue",
+          "description": "Generate vector embeddings for email content using OpenAI models, store them in ChromaDB, and implement a Bull/Redis queue for processing emails asynchronously. Set up batch processing capabilities for historical emails.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Add vector embedding functionality to the `EmailProcessingService`:\n   - Implement `generateEmbeddings` method using OpenAI's embedding models\n   - Select appropriate embedding model (text-embedding-ada-002 recommended)\n   - Create chunking strategy for long emails\n2. Set up ChromaDB integration:\n   - Initialize ChromaDB client\n   - Create collections for storing email embeddings\n   - Implement CRUD operations for embeddings\n3. Build asynchronous processing queue with Bull/Redis:\n   - Create queue producer for adding emails to processing queue\n   - Implement queue consumer for processing emails in background\n   - Add retry logic and error handling\n4. Implement batch processing for historical emails:\n   - Create a batch processor that can handle large volumes\n   - Implement pagination and rate limiting for API calls\n   - Add progress tracking and reporting\n5. Create database transaction management for updating processing status:\n   - Track email processing state in PostgreSQL\n   - Implement atomic updates to prevent race conditions\n6. Add performance monitoring and logging\n7. Write end-to-end tests for the complete pipeline\n8. Create admin API endpoints for monitoring queue status and triggering batch processing",
+          "status": "pending",
+          "parentTaskId": 5
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Develop Queue-Based Processing System",
+      "description": "Implement a robust queue system using Bull for Redis to handle email processing, notifications, and asynchronous tasks.",
+      "status": "pending",
+      "dependencies": [
+        5
+      ],
+      "priority": "medium",
+      "details": "1. Install queue packages: `npm i @bull-board/api bull`\n2. Configure Redis connection\n3. Create queue definitions for email processing, notifications\n4. Implement queue processors with retry logic\n5. Add priority-based processing\n6. Create monitoring dashboard for queues\n7. Implement error handling and dead-letter queues\n8. Add logging and metrics collection\n9. Create queue cleanup and maintenance jobs",
+      "testStrategy": "Test queue performance under load. Verify retry mechanism works correctly. Ensure priority processing functions as expected. Test error handling by introducing deliberate failures.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Set up Redis and configure Bull queue foundations",
+          "description": "Install required packages, configure Redis connection, and create the basic queue definitions for different processing needs (emails, notifications, etc.) with proper configuration.",
+          "dependencies": [],
+          "details": "1. Install the required packages: `npm i bull @bull-board/api @bull-board/express redis`\n2. Create a Redis connection configuration file with proper error handling:\n   - Set up Redis client with retry strategy\n   - Configure authentication if needed\n   - Implement connection event listeners\n   - Create a reusable Redis connection factory\n3. Define queue configuration constants (retry attempts, backoff strategies, timeouts)\n4. Create queue definition module that exports configured queues:\n   - Email processing queue\n   - Notification queue\n   - Generic async task queue\n5. Implement basic queue error handlers\n6. Test Redis connection and basic queue operations\n7. Write unit tests to verify queue configurations are properly applied\n\nEnsure idempotency is considered in the queue design by including unique job IDs where appropriate. Use environment variables for Redis configuration to support different environments.",
+          "status": "pending",
+          "parentTaskId": 6
+        },
+        {
+          "id": 2,
+          "title": "Implement queue processors with advanced error handling",
+          "description": "Create the processor functions for each queue type with robust error handling, retry logic, dead-letter queues, and priority-based processing.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create a processor directory structure to organize different queue processors\n2. Implement the email processor with:\n   - Exponential backoff retry logic (starting with 5s, then 10s, 20s, etc.)\n   - Proper error classification (retriable vs. non-retriable errors)\n   - Idempotency checks before processing\n   - Concurrency limits (process 5 emails at a time)\n3. Implement notification processor with similar patterns but adjusted for notification requirements\n4. Create a generic async task processor with dynamic handler resolution\n5. Implement dead-letter queue logic:\n   - After max retries, move failed jobs to DLQ\n   - Add context and error information to failed jobs\n6. Add priority-based processing:\n   - Configure job options with priority levels (high, medium, low)\n   - Implement priority queue handlers\n7. Create integration tests for each processor\n8. Implement job cleanup and maintenance tasks (remove completed jobs after 24h)\n\nUse the Producer-Consumer pattern with clear separation of concerns. Ensure all processors are stateless to support horizontal scaling.",
+          "status": "pending",
+          "parentTaskId": 6
+        },
+        {
+          "id": 3,
+          "title": "Create monitoring dashboard and observability tools",
+          "description": "Implement a comprehensive monitoring solution with Bull Board UI, metrics collection, logging, and alerting for queue health and performance.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Set up Bull Board UI:\n   - Create an Express router for the dashboard\n   - Configure security middleware (authentication/authorization)\n   - Register all queues with the dashboard\n   - Implement custom UI components for queue visualization\n2. Implement advanced logging:\n   - Use Winston/Pino for structured logging\n   - Log queue events (completed, failed, stalled jobs)\n   - Add correlation IDs for request tracing\n3. Add metrics collection:\n   - Track queue depths, processing times, error rates\n   - Implement Prometheus metrics endpoint\n   - Create custom metrics for business KPIs\n4. Set up alerting:\n   - Configure threshold-based alerts for queue depth\n   - Alert on dead-letter queue items\n   - Set up notification channels (email, Slack)\n5. Create operational dashboards:\n   - Queue health overview\n   - Processing performance metrics\n   - Error trends and patterns\n6. Implement queue cleanup and maintenance jobs:\n   - Schedule periodic cleanup of completed/failed jobs\n   - Monitor Redis memory usage\n   - Implement automated recovery procedures\n7. Test the entire system under load to verify performance\n8. Document the monitoring solution and create runbooks for common issues\n\nEnsure the monitoring solution provides both technical and business insights. Make dashboards accessible to both developers and non-technical stakeholders.",
+          "status": "pending",
+          "parentTaskId": 6
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Implement Real-time Notification Service",
+      "description": "Build the notification service for real-time email alerts with priority-based delivery and status tracking.",
+      "status": "pending",
+      "dependencies": [
+        6
+      ],
+      "priority": "medium",
+      "details": "1. Create NotificationService class\n2. Implement notification types and templates\n3. Create delivery mechanisms (WebSocket, HTTP)\n4. Add priority-based routing\n5. Implement notification status tracking\n6. Create user preference management\n7. Add delivery confirmation handling\n8. Implement notification queuing with Bull\n9. Create notification API endpoints\n10. Add rate limiting for notifications",
+      "testStrategy": "Test notification delivery times to ensure they meet the <500ms requirement. Verify priority-based delivery works correctly. Test user preference settings. Validate delivery status tracking.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement NotificationService Core and Template System",
+          "description": "Create the foundational NotificationService class with a template system that supports different notification types and personalization options.",
+          "dependencies": [],
+          "details": "1. Create a NotificationService class that follows a singleton pattern to ensure a single instance throughout the application.\n2. Implement a template system using a strategy pattern that supports various notification types (e.g., alert, info, warning).\n3. Design template schemas with placeholders for personalization (user name, action details, timestamps).\n4. Create a TemplateRenderer class that can parse templates and inject dynamic content.\n5. Implement template versioning to support updating templates without breaking existing notifications.\n6. Add support for localization/internationalization in templates.\n7. Create a NotificationType enum to categorize notifications (e.g., ACCOUNT, BILLING, SECURITY).\n8. Implement a method to register new notification types.\n9. Add unit tests for template rendering with different content types and edge cases.\n10. Create a configuration system for default templates and notification settings.",
+          "status": "pending",
+          "parentTaskId": 7
+        },
+        {
+          "id": 2,
+          "title": "Implement Priority-Based Queuing and Delivery Mechanisms",
+          "description": "Set up Bull queuing system with priority levels and implement multiple delivery mechanisms including WebSocket and HTTP endpoints.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Integrate Bull.js for robust queue management with Redis as the backing store.\n2. Configure multiple queues based on priority levels (HIGH, MEDIUM, LOW).\n3. Implement queue processors with appropriate concurrency settings for each priority.\n4. Create delivery strategy classes using the adapter pattern for different channels (WebSocket, HTTP, Email).\n5. Implement WebSocket server using Socket.io for real-time notifications.\n6. Create HTTP webhook delivery mechanism for third-party integrations.\n7. Set up email delivery using SendGrid or Mailjet with X-Priority headers support.\n8. Implement retry logic with exponential backoff for failed deliveries.\n9. Add rate limiting middleware to prevent flooding (using Redis-based rate limiter).\n10. Create queue monitoring dashboard for operational visibility.\n11. Implement tests for queue processing and delivery mechanisms using mocks.\n12. Add graceful shutdown handling to prevent message loss during service restarts.",
+          "status": "pending",
+          "parentTaskId": 7
+        },
+        {
+          "id": 3,
+          "title": "Implement Notification Status Tracking and User Preferences",
+          "description": "Create a system for tracking notification status throughout the delivery lifecycle and implement user preference management for notification settings.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Design and implement a database schema for notification logs with fields for status tracking (QUEUED, SENT, DELIVERED, READ, FAILED).\n2. Create a NotificationTracker class that updates notification status at each stage of delivery.\n3. Implement delivery confirmation handlers for each delivery mechanism.\n4. Add webhook endpoints to receive and process delivery status updates from third-party services.\n5. Create a UserPreferenceManager class to store and retrieve user notification preferences.\n6. Implement a RESTful API for users to manage their notification preferences.\n7. Add database indexes for efficient querying of notification history.\n8. Create analytics functions to generate reports on notification effectiveness and engagement.\n9. Implement a notification center UI component for displaying notification history with status indicators.\n10. Add filters for searching notifications by type, status, and date range.\n11. Implement automated cleanup of old notification records to maintain database performance.\n12. Create integration tests for the full notification lifecycle from creation to status updates.",
+          "status": "pending",
+          "parentTaskId": 7
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Develop Context-Aware Email Composer",
+      "description": "Create the intelligent email composition system with context retrieval, semantic search, and smart suggestions.",
+      "status": "pending",
+      "dependencies": [
+        5,
+        7
+      ],
+      "priority": "medium",
+      "details": "1. Create EmailComposerService class\n2. Implement thread analysis using LangChain\n3. Create semantic search functionality with ChromaDB\n4. Implement context retrieval from historical emails\n5. Add smart suggestion generation using OpenAI\n6. Create draft management functionality\n7. Implement email context model and storage\n8. Create API endpoints for composition and suggestions\n9. Add caching for frequently accessed contexts\n10. Implement context relevance scoring",
+      "testStrategy": "Test context retrieval accuracy with sample email threads. Measure semantic search latency to ensure it meets the <200ms requirement. Evaluate suggestion quality with different email scenarios. Test draft management functionality.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Email Context Modeling and Storage",
+          "description": "Create the data models and storage mechanisms for email context retrieval and semantic search capabilities, including integration with ChromaDB for vector storage.",
+          "dependencies": [],
+          "details": "1. Create `EmailContextModel` class to represent email data with metadata fields (sender, recipient, subject, timestamp, thread_id) and content fields (body, attachments)\n2. Implement preprocessing pipeline using BeautifulSoup for HTML email cleaning and text extraction\n3. Build vector embedding generation using Sentence Transformers (all-MiniLM-L6-v2 model) to convert email content to embeddings\n4. Integrate ChromaDB for storing and indexing email embeddings with the following schema:\n   - Collection: 'email_contexts'\n   - Document schema: {id: email_id, text: processed_content, metadata: {thread_id, sender, recipient, timestamp}}\n5. Implement `EmailContextRepository` for CRUD operations on email contexts\n6. Add context relevance scoring using cosine similarity between query vectors and stored email vectors\n7. Implement caching layer for frequently accessed contexts using Redis or an in-memory solution\n8. Add unit tests for context model, embedding generation, and storage operations\n9. Create integration tests for the full context storage and retrieval pipeline",
+          "status": "pending",
+          "parentTaskId": 8
+        },
+        {
+          "id": 2,
+          "title": "Develop Semantic Search and Context Retrieval Service",
+          "description": "Build the core services for semantic search functionality and context retrieval from historical emails using LangChain and the vector database from subtask 1.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create `EmailComposerService` class with dependency injection for the context repository\n2. Implement thread analysis using LangChain's text processing capabilities to extract key topics and entities\n3. Build semantic search functionality with the following components:\n   - Query vector generation using the same embedding model as in subtask 1\n   - Similarity search against ChromaDB collections\n   - Result ranking based on relevance scores and recency\n4. Implement context retrieval methods:\n   - `getRelatedEmails(query, limit)`: Returns semantically similar emails\n   - `getThreadContext(threadId)`: Retrieves full thread history with context\n   - `getContactHistory(contactEmail)`: Gets communication history with a specific contact\n5. Add background indexing job to process and embed new emails as they arrive\n6. Implement context relevance scoring that combines semantic similarity with temporal relevance\n7. Create unit tests for search functionality and thread analysis\n8. Implement performance tests to ensure search latency remains under 500ms\n9. Add logging for search operations and performance metrics",
+          "status": "pending",
+          "parentTaskId": 8
+        },
+        {
+          "id": 3,
+          "title": "Implement Smart Suggestions and Draft Management",
+          "description": "Create the intelligent suggestion system using OpenAI integration and develop the draft management functionality to enable users to save, edit, and manage email drafts.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Integrate OpenAI API for smart suggestion generation with the following features:\n   - Subject line suggestions based on context\n   - Email body generation using retrieved context\n   - Reply suggestions based on thread analysis\n2. Implement prompt engineering techniques to generate contextually appropriate suggestions:\n   - Create template prompts for different email scenarios (introduction, follow-up, request, etc.)\n   - Include relevant context from retrieved emails in prompts\n   - Add tone and style parameters based on user preferences\n3. Build draft management functionality:\n   - Create `DraftService` for saving, retrieving, and updating email drafts\n   - Implement versioning for drafts to allow reverting to previous versions\n   - Add auto-save functionality during composition\n4. Create API endpoints:\n   - POST `/api/composer/suggestions`: Generate suggestions based on context\n   - GET `/api/composer/drafts`: List all drafts\n   - POST `/api/composer/drafts`: Save a draft\n   - PUT `/api/composer/drafts/{id}`: Update a draft\n   - DELETE `/api/composer/drafts/{id}`: Delete a draft\n5. Implement suggestion refinement based on user feedback\n6. Add unit tests for suggestion generation and draft management\n7. Create integration tests for the complete email composition workflow\n8. Implement error handling and fallback mechanisms for API failures\n9. Add telemetry to track suggestion usage and effectiveness",
+          "status": "pending",
+          "parentTaskId": 8
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Implement Performance Optimization and Caching",
+      "description": "Optimize system performance through caching, connection pooling, and query optimization to meet latency requirements.",
+      "status": "pending",
+      "dependencies": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "priority": "low",
+      "details": "1. Implement Redis caching for frequent queries\n2. Configure database connection pooling\n3. Optimize database queries with indexes\n4. Add query result caching\n5. Implement request compression\n6. Add response time logging and monitoring\n7. Optimize ChromaDB queries\n8. Implement batching for API calls\n9. Add performance metrics collection\n10. Create performance testing scripts",
+      "testStrategy": "Conduct load testing to measure system performance under stress. Compare response times before and after optimization. Verify API responses meet the <100ms requirement. Test cache hit rates and effectiveness.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Redis Caching for Frequent Queries",
+          "description": "Set up Redis as a caching layer to store and retrieve frequently accessed data, reducing database load and improving response times",
+          "dependencies": [],
+          "details": "1. Install and configure Redis server with appropriate memory settings and eviction policies (LRU recommended)\n2. Implement a caching service with the following functions:\n   - get(key): Retrieve data from cache\n   - set(key, value, expiry): Store data in cache with TTL\n   - invalidate(key): Remove specific cached items\n   - invalidatePattern(pattern): Remove cached items matching a pattern\n3. Apply the Cache-Aside pattern for read-heavy operations\n4. Implement cache serialization/deserialization for complex objects\n5. Add cache hit/miss metrics collection\n6. Create cache warming mechanism for critical data\n7. Implement cache versioning strategy to handle schema changes\n8. Add unit tests for caching logic\n9. Test cache performance under load with different data sizes\n10. Document caching strategy and configuration settings",
+          "status": "pending",
+          "parentTaskId": 9
+        },
+        {
+          "id": 2,
+          "title": "Optimize Database Performance with Connection Pooling and Query Optimization",
+          "description": "Enhance database performance through connection pooling, query optimization, and proper indexing strategies",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Configure database connection pooling with appropriate settings:\n   - Set optimal pool size based on workload (start with 2N+1 where N is CPU cores)\n   - Configure connection timeout, idle timeout, and max lifetime\n   - Implement health checks for connections\n2. Analyze and optimize database queries:\n   - Review execution plans for slow queries\n   - Create appropriate indexes for frequently queried columns\n   - Refactor queries to select only required columns (avoid SELECT *)\n   - Use EXPLAIN ANALYZE to verify query improvements\n3. Implement query result caching for expensive operations:\n   - Identify queries suitable for caching based on frequency and computational cost\n   - Use Redis (from subtask 1) to store query results with appropriate TTL\n   - Add cache invalidation triggers for data modifications\n4. Optimize ChromaDB queries:\n   - Review and optimize vector similarity searches\n   - Implement appropriate batch sizes for vector operations\n5. Create database index maintenance plan\n6. Add unit and integration tests for database access patterns\n7. Document database optimization strategies",
+          "status": "pending",
+          "parentTaskId": 9
+        },
+        {
+          "id": 3,
+          "title": "Implement Performance Monitoring and Metrics Collection",
+          "description": "Set up comprehensive performance monitoring, metrics collection, and testing infrastructure to ensure optimizations are effective and identify areas for improvement",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Implement response time logging for all API endpoints:\n   - Add middleware to track request/response times\n   - Log timing data with appropriate context (endpoint, user, parameters)\n2. Set up performance metrics collection:\n   - Track cache hit/miss ratios\n   - Monitor database connection pool utilization\n   - Measure query execution times\n   - Record API call latencies\n   - Monitor memory and CPU usage\n3. Implement request compression:\n   - Enable gzip/brotli compression for HTTP responses\n   - Configure appropriate compression levels\n4. Create a performance dashboard:\n   - Visualize key performance metrics\n   - Set up alerting for performance degradation\n5. Develop performance testing scripts:\n   - Create load testing scenarios with realistic user patterns\n   - Implement benchmarking for critical operations\n   - Set up CI/CD integration for performance testing\n6. Implement batching for API calls:\n   - Group related operations into batch requests\n   - Optimize for reduced network overhead\n7. Document performance baselines and targets\n8. Create a performance optimization runbook for future reference",
+          "status": "pending",
+          "parentTaskId": 9
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Implement Security Measures and Testing",
+      "description": "Enhance system security with data encryption, input validation, security headers, and comprehensive testing.",
+      "status": "pending",
+      "dependencies": [
+        3,
+        9
+      ],
+      "priority": "medium",
+      "details": "1. Implement data encryption at rest\n2. Add input validation and sanitization\n3. Configure security headers (CSRF, XSS protection)\n4. Implement rate limiting for all endpoints\n5. Add SQL injection protection\n6. Create security middleware\n7. Implement audit logging\n8. Add penetration testing scripts\n9. Create security configuration documentation\n10. Implement automated security scanning",
+      "testStrategy": "Conduct penetration testing to identify vulnerabilities. Test rate limiting effectiveness. Verify input validation by attempting SQL injection and XSS attacks. Ensure all sensitive data is properly encrypted.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Data Encryption and Input Validation",
+          "description": "Set up encryption mechanisms for sensitive data at rest and implement comprehensive input validation across the application to prevent injection attacks.",
+          "dependencies": [],
+          "details": "1. Implement AES-256 encryption for sensitive data at rest using the cryptography library:\n   - Set up a secure key management system using a service like AWS KMS or Azure Key Vault\n   - Create an encryption service that handles encryption/decryption operations\n   - Implement PBKDF2 for password-based key derivation with sufficient iterations (100,000+)\n   - Ensure proper IV (Initialization Vector) generation for each encryption operation\n\n2. Develop input validation framework:\n   - Use a schema validation library like Pydantic or Marshmallow to create data models\n   - Implement allowlisting approach for all user inputs\n   - Create validators for common input types (emails, usernames, dates, etc.)\n   - Add sanitization for HTML/script content to prevent XSS\n   - Implement type checking and range validation for numeric inputs\n\n3. Testing approach:\n   - Create unit tests for encryption/decryption functions with known test vectors\n   - Test input validation with both valid and invalid inputs\n   - Verify encryption key rotation mechanisms\n   - Benchmark encryption performance with large datasets",
+          "status": "pending",
+          "parentTaskId": 10
+        },
+        {
+          "id": 2,
+          "title": "Configure Security Headers and Middleware",
+          "description": "Implement HTTP security headers, CSRF protection, and security middleware to prevent common web vulnerabilities and add rate limiting to protect against brute force attacks.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Implement HTTP security headers:\n   - Configure Content-Security-Policy (CSP) to restrict resource loading\n   - Set up Strict-Transport-Security (HSTS) with a long max-age\n   - Add X-Frame-Options to prevent clickjacking\n   - Implement X-Content-Type-Options: nosniff\n   - Configure Referrer-Policy to control information leakage\n\n2. Develop security middleware:\n   - Create middleware to apply security headers consistently\n   - Implement CSRF protection with token validation\n   - Add SQL injection protection middleware that validates database queries\n   - Create rate limiting middleware with Redis backend:\n     - Configure per-endpoint rate limits based on risk profile\n     - Implement progressive delays for repeated failed attempts\n     - Add IP-based and user-based rate limiting\n\n3. Implement audit logging:\n   - Log all security-relevant events (login attempts, permission changes, etc.)\n   - Include relevant context (user ID, IP address, timestamp) in logs\n   - Ensure logs are tamper-resistant and stored securely\n\n4. Testing approach:\n   - Use tools like Mozilla Observatory or SecurityHeaders.com to verify header configuration\n   - Test rate limiting with automated request scripts\n   - Verify CSRF protection with cross-domain request tests\n   - Validate audit log completeness and integrity",
+          "status": "pending",
+          "parentTaskId": 10
+        },
+        {
+          "id": 3,
+          "title": "Implement Security Testing and Documentation",
+          "description": "Set up automated security scanning, penetration testing scripts, and create comprehensive security documentation to ensure ongoing security assessment and knowledge transfer.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Implement automated security scanning:\n   - Integrate OWASP Dependency-Check into CI/CD pipeline to scan dependencies\n   - Set up SAST (Static Application Security Testing) using tools like Bandit for Python or ESLint security plugins for JavaScript\n   - Configure DAST (Dynamic Application Security Testing) using OWASP ZAP with automation scripts\n   - Create scheduled vulnerability scans with automated reporting\n\n2. Develop penetration testing scripts:\n   - Create scripts for common attack vectors (SQL injection, XSS, CSRF)\n   - Implement fuzz testing for API endpoints to discover edge cases\n   - Set up authentication bypass test cases\n   - Create scripts to test for sensitive data exposure\n\n3. Create security configuration documentation:\n   - Document encryption implementation details and key management procedures\n   - Create security headers configuration guide\n   - Document input validation rules and sanitization processes\n   - Provide guidelines for secure coding practices\n   - Create incident response procedures\n   - Document security testing methodologies and schedule\n\n4. Testing approach:\n   - Run full security scan suite against staging environment\n   - Validate documentation accuracy through peer review\n   - Conduct regular security exercises to test incident response\n   - Perform manual penetration testing to supplement automated tests",
+          "status": "pending",
+          "parentTaskId": 10
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "projectName": "mail.ai V1 Backend Implementation",
+    "totalTasks": 10,
+    "sourceFile": "mail-ai-backend-prd.txt",
+    "generatedAt": "2023-11-16"
+  }
+}

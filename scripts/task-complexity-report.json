@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "generatedAt": "2025-04-09T20:15:32.695Z",
+    "tasksAnalyzed": 10,
+    "thresholdScore": 5,
+    "projectName": "Your Project Name",
+    "usedResearch": true
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 1,
+      "taskTitle": "Setup AdonisJS Project with TypeScript",
+      "complexityScore": 4,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the steps for installing dependencies, initializing the project, configuring TypeScript, setting up the environment, and initializing Git.",
+      "reasoning": "This task involves straightforward steps and well-documented processes for setting up an AdonisJS project. The complexity arises from configuring TypeScript and structuring the project correctly."
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "Configure Database Connections and Migrations",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Detail the steps for installing database libraries, configuring connections, creating migrations, implementing models, and setting up initial data.",
+      "reasoning": "Database configuration is moderately complex due to the need to integrate multiple databases, create schemas, and handle migrations, which requires careful attention to detail."
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "Implement Google OAuth Authentication System",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Expand on setting up Google OAuth, implementing JWT management, creating middleware, and securing authentication routes.",
+      "reasoning": "OAuth integration is challenging due to the need for secure token handling, middleware creation, and ensuring compliance with security best practices."
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "Build Gmail API Integration for Email Sync",
+      "complexityScore": 9,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the steps for setting up the Gmail API client, implementing OAuth2, handling pagination, and storing email metadata.",
+      "reasoning": "This task is highly complex due to the need for API integration, real-time updates, and robust error handling mechanisms."
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "Implement Email Processing and Classification System",
+      "complexityScore": 10,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Decompose the task into steps for integrating LangChain, building a classification pipeline, generating embeddings, and setting up a processing queue.",
+      "reasoning": "The task's complexity is due to integrating AI models, processing large amounts of data, and ensuring efficient pipeline performance."
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "Develop Queue-Based Processing System",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "List steps for setting up Redis, configuring queues, implementing processors, and creating a monitoring dashboard.",
+      "reasoning": "This task involves a moderate level of complexity, requiring knowledge of queue management, error handling, and monitoring."
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "Implement Real-time Notification Service",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Detail the steps for creating notification templates, setting up delivery mechanisms, and implementing priority-based routing and queuing.",
+      "reasoning": "Real-time notifications are complex due to the need for low-latency delivery, user preference management, and priority handling."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Develop Context-Aware Email Composer",
+      "complexityScore": 9,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Decompose the task into steps for implementing context retrieval, semantic search, smart suggestions, and draft management.",
+      "reasoning": "The task is complex due to its reliance on AI for context-aware features and the need for efficient data retrieval and storage."
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "Implement Performance Optimization and Caching",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the steps for implementing caching, optimizing queries, and adding performance metrics.",
+      "reasoning": "Optimizing performance is complex due to the need for identifying bottlenecks and implementing caching while maintaining system accuracy."
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "Implement Security Measures and Testing",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "List steps for implementing encryption, input validation, security headers, and automated security scans.",
+      "reasoning": "Security implementation is moderately complex as it involves multiple layers of protection and extensive testing to ensure system integrity."
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+# Task ID: 3
+# Title: Implement Google OAuth Authentication System
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Develop the authentication system with Google OAuth 2.0 integration, JWT token management, and user session handling.
+# Details:
+1. Install auth packages: `npm i @adonisjs/auth passport passport-google-oauth20 jsonwebtoken`
+2. Configure Google OAuth provider in config/auth.ts
+3. Create AuthController with login, refresh, and logout methods
+4. Implement JWT token generation and validation
+5. Create middleware for authentication and rate limiting
+6. Setup user model with OAuth credential storage
+7. Implement token refresh mechanism
+8. Create authentication routes in start/routes.ts
+9. Add security headers and CORS configuration
+
+# Test Strategy:
+Test OAuth flow with a test Google account. Verify JWT token generation, validation, and refresh. Test rate limiting by making multiple requests. Ensure proper error handling for invalid credentials.
+
+# Subtasks:
+## 1. Configure Google OAuth Provider and User Model [pending]
+### Dependencies: None
+### Description: Set up the Google OAuth 2.0 provider configuration, create the necessary user model with OAuth credential storage, and implement the authentication controller for handling login flows.
+### Details:
+1. Install required packages: `npm i @adonisjs/auth @adonisjs/ally` etc
+2. Register a new project in Google Cloud Platform:
+   - Navigate to API & Services > Credentials
+   - Create OAuth 2.0 Client ID
+   - Configure Authorized Redirect URIs (e.g., `http://localhost:3333/auth/google/callback` for development)
+   - Save Client ID and Client Secret as environment variables
+3. Configure Google OAuth provider in `config/auth.ts`:
+   - Set up passport strategy with Google provider
+   - Define scopes (recommend: ['profile', 'email'])
+   - Configure callback URL
+4. Create or modify User model to store OAuth credentials:
+   - Add fields: `email`, `googleId`, `name`, `avatar`, `refreshToken`
+   - Create migration for the users table
+   - Add methods for finding users by OAuth ID
+5. Create AuthController with login method:
+   - Implement Google OAuth authentication flow
+   - Handle user creation/retrieval based on Google profile
+   - Use state parameter to prevent CSRF attacks
+6. Testing approach:
+   - Unit test User model methods
+   - Mock Google OAuth responses for controller tests
+   - Test user creation and retrieval flows
+
+## 2. Implement JWT Token Management System [pending]
+### Dependencies: 3.1
+### Description: Build a comprehensive JWT token management system including token generation, validation, and refresh mechanisms to handle user authentication securely.
+### Details:
+1. Create a JWT service for token operations:
+   - Implement token generation with appropriate claims (userId, email)
+   - Set short-lived access tokens (15 minutes) and longer refresh tokens (7 days)
+   - Add token validation and payload extraction functions
+   - Use environment variables for JWT secret keys
+2. Extend AuthController with additional methods:
+   - Complete the login flow to generate and return JWT tokens
+   - Implement refresh token endpoint to issue new access tokens
+   - Create logout method to invalidate tokens
+3. Create a token blacklist mechanism:
+   - Use Redis or database to store revoked tokens
+   - Implement token rotation for refresh tokens
+   - Add checks during validation to verify tokens aren't blacklisted
+4. Implement secure token storage:
+   - Configure HTTP-only, secure cookies for tokens
+   - Add appropriate expiration and path settings
+   - Implement CSRF protection for token endpoints
+5. Testing approach:
+   - Unit test JWT service methods
+   - Test token generation, validation, and refresh flows
+   - Verify token expiration and blacklisting works correctly
+   - Test against common JWT vulnerabilities
+
+## 3. Create Authentication Middleware and Secure Routes [pending]
+### Dependencies: 3.1, 3.2
+### Description: Develop authentication middleware, implement rate limiting, set up secure routes, and add security headers to protect the authentication system.
+### Details:
+1. Create authentication middleware:
+   - Implement JWT verification middleware
+   - Extract user information from valid tokens
+   - Handle authentication errors with appropriate responses
+   - Add role-based permission checks if needed
+2. Implement rate limiting middleware:
+   - Add rate limiting for authentication endpoints
+   - Configure different limits for login, refresh, and other sensitive routes
+   - Use Redis or in-memory store for tracking request counts
+3. Set up authentication routes in `start/routes.ts`:
+   - Create routes for Google OAuth login: `/auth/google`
+   - Add callback route: `/auth/google/callback`
+   - Implement token refresh route: `/auth/refresh`
+   - Add logout endpoint: `/auth/logout`
+   - Create a protected route test endpoint
+4. Configure security headers and CORS:
+   - Add Helmet.js for security headers
+   - Set up appropriate Content-Security-Policy
+   - Configure CORS with trusted origins only
+   - Implement SameSite cookie attributes
+5. Create comprehensive error handling:
+   - Handle OAuth errors gracefully
+   - Provide clear error messages for authentication failures
+   - Log security events appropriately
+6. Testing approach:
+   - Test middleware with valid and invalid tokens
+   - Verify rate limiting works as expected
+   - Use integration tests for full authentication flow
+   - Test CORS and security headers configuration
+

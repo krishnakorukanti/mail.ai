@@ -1,0 +1,92 @@
+# Task ID: 5
+# Title: Implement Email Processing and Classification System
+# Status: pending
+# Dependencies: 4
+# Priority: high
+# Description: Develop the core email processing pipeline with classification, spam detection, and vector embedding generation using LangChain and OpenAI.
+# Details:
+1. Install AI packages: `npm i langchain openai`
+2. Create EmailProcessingService with classification pipeline
+3. Implement LangChain integration for email content analysis
+4. Create spam detection algorithm using OpenAI
+5. Implement priority classification based on content and sender
+6. Generate vector embeddings for email content
+7. Store embeddings in ChromaDB
+8. Update processing status in PostgreSQL
+9. Implement batch processing for historical emails
+10. Create processing queue with Bull/Redis
+
+# Test Strategy:
+Test classification with sample emails of various types. Validate spam detection accuracy. Measure processing time to ensure it meets the <2s requirement. Verify correct embedding storage in ChromaDB.
+
+# Subtasks:
+## 1. Set up LangChain and OpenAI integration with basic email preprocessing [pending]
+### Dependencies: None
+### Description: Install required packages and create the foundation for the email processing service with preprocessing capabilities. Implement core LangChain integration for connecting with OpenAI models and set up the initial email content cleaning pipeline.
+### Details:
+1. Install required packages: `npm i langchain openai chromadb bullmq redis`
+2. Create an `EmailProcessingService` class with configuration for OpenAI API keys and model selection
+3. Implement email content preprocessing functions to:
+   - Remove HTML tags using regex
+   - Clean special characters
+   - Normalize text (lowercase, whitespace)
+   - Extract key metadata (sender, subject, recipients)
+4. Set up LangChain integration:
+   - Initialize OpenAI models through LangChain
+   - Create a basic processing chain for email content
+   - Implement error handling for API failures
+5. Create utility functions for handling different email formats
+6. Write unit tests for preprocessing functions using sample emails
+7. Document the service interface with JSDoc
+
+## 2. Implement classification pipeline with spam detection and priority scoring [pending]
+### Dependencies: 5.1
+### Description: Build the core classification functionality using LangChain and OpenAI to analyze email content, detect spam, and assign priority scores. Create a modular pipeline that processes emails through multiple classification stages.
+### Details:
+1. Extend the `EmailProcessingService` to add classification capabilities:
+   - Create a `classifyEmail` method that orchestrates the classification pipeline
+   - Implement spam detection using OpenAI's content moderation API
+   - Build priority classification based on sender reputation and content relevance
+2. Implement LangChain chains for classification:
+   - Create prompt templates for different classification tasks
+   - Set up a sequential chain for multi-stage classification
+   - Configure temperature and other model parameters for optimal results
+3. Build a spam detection module:
+   - Use OpenAI's content moderation endpoint for initial filtering
+   - Implement custom rules for known spam patterns
+   - Calculate spam confidence scores
+4. Create priority scoring algorithm:
+   - Analyze sender information (domain reputation, previous interactions)
+   - Extract urgency signals from subject and content
+   - Implement configurable priority thresholds
+5. Add database integration to store classification results in PostgreSQL
+6. Write integration tests for the classification pipeline
+7. Create a monitoring system to track classification accuracy
+
+## 3. Implement vector embedding generation and processing queue [pending]
+### Dependencies: 5.1, 5.2
+### Description: Generate vector embeddings for email content using OpenAI models, store them in ChromaDB, and implement a Bull/Redis queue for processing emails asynchronously. Set up batch processing capabilities for historical emails.
+### Details:
+1. Add vector embedding functionality to the `EmailProcessingService`:
+   - Implement `generateEmbeddings` method using OpenAI's embedding models
+   - Select appropriate embedding model (text-embedding-ada-002 recommended)
+   - Create chunking strategy for long emails
+2. Set up ChromaDB integration:
+   - Initialize ChromaDB client
+   - Create collections for storing email embeddings
+   - Implement CRUD operations for embeddings
+3. Build asynchronous processing queue with Bull/Redis:
+   - Create queue producer for adding emails to processing queue
+   - Implement queue consumer for processing emails in background
+   - Add retry logic and error handling
+4. Implement batch processing for historical emails:
+   - Create a batch processor that can handle large volumes
+   - Implement pagination and rate limiting for API calls
+   - Add progress tracking and reporting
+5. Create database transaction management for updating processing status:
+   - Track email processing state in PostgreSQL
+   - Implement atomic updates to prevent race conditions
+6. Add performance monitoring and logging
+7. Write end-to-end tests for the complete pipeline
+8. Create admin API endpoints for monitoring queue status and triggering batch processing
+

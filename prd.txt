@@ -1,0 +1,318 @@
+# mail.ai V1: AI-Powered Email Management System - Backend PRD
+
+# Overview
+mail.ai V1 backend system provides intelligent email processing and management capabilities, focusing on email classification, spam detection, and context-aware email composition using AI/ML technologies.
+
+## Core Objectives
+- Automated email processing and classification
+- Intelligent spam detection and cleanup
+- Context-aware email composition
+- Real-time email notifications
+- Secure email data management
+
+## Target Scale for V1
+- Up to 10,000 emails per user
+- Up to 1,000 active users
+- Processing latency < 2 seconds per email
+- Real-time notification delivery
+
+# Technical Architecture
+
+## Core Technologies
+1. Backend Framework
+   - AdonisJS 5.x
+   - TypeScript
+   - Node.js 18+
+
+2. Databases
+   - PostgreSQL 15+ (Primary Database)
+     - User data
+     - Email metadata
+     - Authentication records
+     - System configurations
+   
+   - ChromaDB (Vector Database)
+     - Email embeddings
+     - Semantic search indexes
+     - Context storage for LLM
+
+3. AI/ML Stack
+   - LangChain.js
+   - OpenAI API (GPT-4)
+   - Email classification models
+   - Text embeddings
+
+4. Authentication
+   - Google OAuth 2.0
+   - JWT tokens
+   - Session management
+
+5. Message Queue
+   - Bull for Redis
+   - Email processing queues
+   - Notification queues
+
+# Core Features & Implementation
+
+## 1. User Authentication System
+### Features
+- Google OAuth integration
+- JWT-based session management
+- Secure token storage
+- Rate limiting
+
+### Data Model: User
+The user model stores essential information including:
+- Unique identifier and email
+- Google OAuth credentials (ID and tokens)
+- Email synchronization status tracking
+- Last sync timestamp
+- User preferences and settings
+- Token refresh mechanism
+- Security and rate limiting data
+
+## 2. Email Processing System
+### Initial Inbox Processing
+- Batch processing of existing emails
+- Classification and flagging
+- Spam detection and removal
+- Vector embedding generation
+
+### Data Models
+#### Email Processing Record
+Tracks the processing status of each email with:
+- Processing status tracking
+- Classification results
+- Spam score calculation
+- Importance level assignment
+- Vector embeddings storage
+- Processing metadata and timestamps
+
+#### Email Classification
+Stores classification results including:
+- Category assignment
+- Confidence scoring
+- Multiple flag assignments
+- Spam detection results
+- Promotional content detection
+- Sentiment analysis results
+
+## 3. Real-time Email Processing
+### Features
+- Webhook integration with Gmail
+- Real-time email classification
+- Instant notification dispatch
+- Context updating
+
+### Queue Configuration
+The email processing queue system includes:
+- Unique queue identification
+- User and email tracking
+- Priority-based processing
+- Timestamp tracking
+- Retry mechanism with exponential backoff
+- Error handling and logging
+- Queue monitoring and metrics
+
+## 4. Context-Aware Email Composer
+### Features
+- Previous email context retrieval
+- Semantic search in email history
+- Smart suggestions
+- Draft management
+
+### Data Model: Email Context
+Manages email context with:
+- Thread identification
+- Historical email storage
+- Relevant context mapping
+- Similarity scoring
+- Content storage
+- Smart suggestion storage
+- Context retrieval optimization
+
+## 5. Notification Service
+### Features
+- Real-time email notifications
+- Priority-based delivery
+- Delivery status tracking
+- User preference management
+
+### Data Model: Notification
+Handles notification management with:
+- Unique notification tracking
+- User association
+- Email reference
+- Type classification
+- Priority assignment
+- Status tracking
+- Metadata storage
+- Delivery confirmation
+
+# Database Schema
+
+## PostgreSQL Tables
+1. users
+   - Authentication data
+   - Profile information
+   - OAuth credentials
+   - System preferences
+
+2. email_metadata
+   - Email headers
+   - Processing status
+   - Classification results
+   - Thread information
+
+3. processing_records
+   - Processing status
+   - Classification details
+   - Timestamp tracking
+   - Error logging
+
+4. notifications
+   - Delivery tracking
+   - Status management
+   - User preferences
+   - Priority handling
+
+5. user_settings
+   - Notification preferences
+   - Processing rules
+   - UI preferences
+   - Feature toggles
+
+6. email_threads
+   - Thread management
+   - Context tracking
+   - Participant information
+   - Timeline data
+
+7. classification_rules
+   - Rule definitions
+   - Priority settings
+   - Category mappings
+   - Custom filters
+
+## ChromaDB Collections
+1. email_embeddings
+   - Vector representations
+   - Metadata mapping
+   - Search indexes
+
+2. context_vectors
+   - Thread embeddings
+   - Semantic relationships
+   - Context mapping
+
+3. semantic_indexes
+   - Search optimization
+   - Similarity matching
+   - Quick retrieval
+
+# API Endpoints
+
+## Authentication
+- POST /auth/google
+- POST /auth/refresh
+- POST /auth/logout
+
+## Email Processing
+- POST /emails/sync
+- GET /emails/status
+- POST /emails/process
+- DELETE /emails/spam
+
+## Email Composition
+- POST /emails/compose
+- GET /emails/context/:threadId
+- POST /emails/suggestions
+
+## Notifications
+- POST /notifications/settings
+- PUT /notifications/preferences
+- GET /notifications/status
+
+# Development Phases
+
+## Phase 1: Foundation (Weeks 1-3)
+1. Core Setup
+   - AdonisJS project setup
+   - Database migrations
+   - Google OAuth integration
+   - Basic email sync
+
+2. Email Processing
+   - Gmail API integration
+   - Basic classification system
+   - ChromaDB setup
+   - Vector embedding pipeline
+
+## Phase 2: Core Features (Weeks 4-6)
+1. Advanced Processing
+   - Spam detection
+   - Priority classification
+   - Context extraction
+   - Thread management
+
+2. Notification System
+   - Real-time notifications
+   - Priority routing
+   - Delivery tracking
+
+## Phase 3: Email Composer (Weeks 7-8)
+1. Context System
+   - Thread analysis
+   - Semantic search
+   - Context retrieval
+   - Smart suggestions
+
+## Phase 4: Testing & Optimization (Weeks 9-10)
+1. Performance
+   - Load testing
+   - Optimization
+   - Caching implementation
+
+2. Security
+   - Penetration testing
+   - Security audits
+   - Rate limiting
+
+# Technical Requirements
+
+## Performance
+- Email processing < 2s
+- API response < 100ms
+- Real-time notification < 500ms
+- Search latency < 200ms
+
+## Security
+- OAuth 2.0 implementation
+- Data encryption at rest
+- Rate limiting
+- Input sanitization
+- CORS configuration
+
+## Scalability
+- Horizontal scaling support
+- Queue-based processing
+- Caching strategy
+- Connection pooling
+
+# Future Considerations (V2)
+1. Auto Reply System
+   - Rule-based responses
+   - Template management
+   - Response tracking
+
+2. Data Extraction
+   - Custom extraction rules
+   - Template matching
+   - Data validation
+   - Export capabilities
+
+3. Advanced Analytics
+   - Email patterns
+   - Response metrics
+   - User behavior
+   - System performance

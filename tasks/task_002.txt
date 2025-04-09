@@ -1,0 +1,118 @@
+# Task ID: 2
+# Title: Configure Database Connections and Migrations
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Set up PostgreSQL and ChromaDB connections, create database schemas, and implement migrations for all required tables.
+# Details:
+1. Install PostgreSQL provider: `npm i @adonisjs/lucid`
+2. Configure PostgreSQL connection in config/database.ts
+3. Install ChromaDB client: `npm i chromadb`
+4. Create ChromaDB service wrapper
+5. Create migrations for all PostgreSQL tables (users, email_metadata, processing_records, notifications, user_settings, email_threads, classification_rules)
+6. Implement models with relationships
+7. Create initialization script for ChromaDB collections (email_embeddings, context_vectors, semantic_indexes)
+8. Setup database seeders for testing
+
+# Test Strategy:
+Run migrations and verify tables are created correctly. Test connections to both databases with simple queries. Run seeders to populate test data.
+
+# Subtasks:
+## 1. Set up PostgreSQL Docker container and connection configuration [pending]
+### Dependencies: None
+### Description: Create Docker configuration for PostgreSQL, configure connection settings in the application, and implement connection pooling with proper environment variable management.
+### Details:
+1. Create a Docker configuration for PostgreSQL in `docker-compose.yml`:
+   - Use the official PostgreSQL image (postgres:14-alpine for smaller size)
+   - Configure environment variables (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB)
+   - Set up volume mapping for data persistence (`./pgdata:/var/lib/postgresql/data`)
+   - Expose the standard port (5432) with proper network configuration
+
+2. Install the AdonisJS Lucid provider: `npm i @adonisjs/lucid`
+
+3. Configure the PostgreSQL connection in `config/database.ts`:
+   - Set up environment variables in `.env` file (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
+   - Implement connection pooling with appropriate settings (min: 2, max: 20)
+   - Add SSL configuration for production environments
+   - Configure query timeout and reconnection strategies
+
+4. Create a database initialization script in `docker-entrypoint-initdb.d/` to ensure database and extensions are created on container startup
+
+5. Test the connection with a health check endpoint in the application
+
+Testing approach:
+- Verify container starts successfully with `docker-compose up postgres`
+- Test connection from application with `node ace db:ping`
+- Implement and run a simple query test to validate connection settings
+
+## 2. Create PostgreSQL migrations and models with relationships [pending]
+### Dependencies: 2.1
+### Description: Design and implement database schema migrations for all required tables with proper relationships, constraints, and indexes.
+### Details:
+1. Create database migrations for all required tables using AdonisJS migration system:
+   - Users table: `node ace make:migration users`
+     - Include columns: id, email, password_hash, name, role, created_at, updated_at
+     - Add appropriate indexes on email and role fields
+   - Email metadata table: `node ace make:migration email_metadata`
+     - Include columns: id, user_id (foreign key), subject, sender, recipients, date, content_preview, created_at, updated_at
+     - Add indexes on user_id, date, and sender
+   - Processing records table: `node ace make:migration processing_records`
+     - Track processing status of emails
+   - Notifications table: `node ace make:migration notifications`
+   - User settings table: `node ace make:migration user_settings`
+   - Email threads table: `node ace make:migration email_threads`
+   - Classification rules table: `node ace make:migration classification_rules`
+
+2. Implement models with relationships using Lucid ORM:
+   - Create User model with relationships to emails, settings, etc.
+   - Create EmailMetadata model with relationship to User
+   - Create remaining models with proper relationships
+   - Implement relationship methods (hasMany, belongsTo, etc.)
+
+3. Set up database seeders for testing:
+   - Create seeders for each table with realistic test data
+   - Implement a master seeder that runs all seeders in the correct order
+
+4. Run migrations with `node ace migration:run`
+
+Testing approach:
+- Verify migrations apply successfully
+- Test model relationships with simple queries
+- Run seeders and validate data integrity
+
+## 3. Set up ChromaDB Docker container and collection initialization [pending]
+### Dependencies: 2.1
+### Description: Configure ChromaDB in Docker, create a service wrapper for the application, and implement initialization scripts for required collections.
+### Details:
+1. Create Docker configuration for ChromaDB in `docker-compose.yml`:
+   - Use the official ChromaDB image
+   - Configure environment variables for authentication and settings
+   - Set up volume mapping for data persistence (`./chroma_data:/chroma/chroma_data`)
+   - Expose the API port (8000) with proper network configuration
+   - Configure health checks for container monitoring
+
+2. Install ChromaDB client: `npm i chromadb`
+
+3. Create a ChromaDB service wrapper in `app/Services/ChromaDBService.ts`:
+   - Implement connection management with retry logic
+   - Create methods for common operations (addItem, queryCollection, etc.)
+   - Add error handling and logging
+   - Implement connection pooling if supported
+
+4. Create initialization script for ChromaDB collections:
+   - Implement script to create collections on application startup:
+     - email_embeddings: Store vector embeddings of email content
+     - context_vectors: Store contextual information vectors
+     - semantic_indexes: Store semantic search indexes
+   - Add metadata schemas for each collection
+   - Configure distance metrics (cosine, euclidean, etc.) based on collection needs
+
+5. Create utility functions for vector operations:
+   - Implement functions for vector similarity search
+   - Add batch processing capabilities for efficient operations
+
+Testing approach:
+- Verify ChromaDB container starts successfully
+- Test collection creation and basic operations
+- Benchmark vector insertion and query performance
+

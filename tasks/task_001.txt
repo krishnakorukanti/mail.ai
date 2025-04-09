@@ -1,0 +1,87 @@
+# Task ID: 1
+# Title: Setup AdonisJS Project with TypeScript
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Initialize the AdonisJS 5.x project with TypeScript, Node.js 18+, and configure the basic project structure for the mail.ai backend.
+# Details:
+1. Install AdonisJS CLI: `npm i -g @adonisjs/cli`
+2. Create new project: `npx create-adonis-ts-app mail-ai-backend`
+3. Configure TypeScript settings in tsconfig.json
+4. Setup environment variables (.env) with necessary configurations
+5. Implement folder structure for controllers, models, services, and middleware
+6. Setup linting and code formatting (ESLint, Prettier)
+7. Initialize Git repository with proper .gitignore
+
+# Test Strategy:
+Verify project setup by running the server and confirming it starts without errors. Run linting checks to ensure code style consistency.
+
+# Subtasks:
+## 1. Initialize AdonisJS project with TypeScript and Node.js 18+ [pending]
+### Dependencies: None
+### Description: Set up a new AdonisJS 5.x project with TypeScript support using the official CLI tools and configure the basic application settings.
+### Details:
+1. Verify Node.js 18+ is installed by running `node -v`
+2. Create a new AdonisJS project with TypeScript using the command: `npm init adonis-ts-app@latest mail-ai-backend`
+3. During project initialization:
+   - Select 'api' as the project structure for a REST API server
+   - Enable ESLint and Prettier when prompted
+   - Skip Webpack Encore unless frontend asset compilation is needed
+4. Navigate to the project directory: `cd mail-ai-backend`
+5. Start the development server to verify setup: `node ace serve --watch`
+6. Verify the server is running by accessing http://localhost:3333
+7. Test the TypeScript compilation by making a small change to a TypeScript file and ensuring it recompiles correctly
+8. Document project initialization details in README.md
+
+## 2. Configure TypeScript settings and project structure [pending]
+### Dependencies: 1.1
+### Description: Customize TypeScript configuration for optimal development experience and establish the folder structure following AdonisJS best practices.
+### Details:
+1. Review and adjust the auto-generated tsconfig.json file with the following settings:
+   - Set `target` to `es2020` or higher for Node.js 18+ compatibility
+   - Ensure `strict` is set to `true` for type safety
+   - Verify path aliases are correctly configured for imports
+2. Create additional folders for better organization:
+   - `app/Services/` for business logic services
+   - `app/Validators/` for request validation
+   - `app/Interfaces/` for TypeScript interfaces
+   - `app/Utils/` for utility functions
+3. Create a basic controller to test the structure: `node ace make:controller Api/Test`
+4. Create a basic route in `start/routes.ts` that uses the test controller
+5. Implement proper error handling in `app/Exceptions/Handler.ts`
+6. Setup custom TypeScript types in `contracts` directory for application-specific types
+7. Test the project structure by running: `node ace list:routes` to verify routes are registered correctly
+
+## 3. Setup environment configuration and initialize Git repository [pending]
+### Dependencies: 1.1, 1.2
+### Description: Configure environment variables, setup linting/formatting tools, and initialize Git with proper ignore patterns for a production-ready development workflow.
+### Details:
+1. Copy `.env.example` to `.env` and configure essential environment variables:
+   - `PORT=3333`
+   - `HOST=0.0.0.0`
+   - `NODE_ENV=development`
+   - `APP_KEY` (generate with `node ace generate:key`)
+   - `DB_CONNECTION=sqlite` (for development)
+2. Create `.env.test` for testing environment configuration
+3. Configure ESLint and Prettier:
+   - Review and customize `.eslintrc.json` for TypeScript rules
+   - Create `.prettierrc` with project formatting standards
+   - Add lint and format scripts to package.json:
+     ```
+     "lint": "eslint . --ext=.ts",
+     "format": "prettier --write ."
+     ```
+4. Initialize Git repository: `git init`
+5. Create a comprehensive `.gitignore` file including:
+   - `node_modules/`
+   - `.env`
+   - `.env.test`
+   - `build/`
+   - `tmp/`
+   - `coverage/`
+   - `.DS_Store`
+   - Editor-specific files (e.g., `.vscode/`)
+6. Create a `.editorconfig` file for consistent coding style across editors
+7. Make an initial commit: `git add . && git commit -m "Initial project setup"`
+8. Test the environment configuration by running: `node ace serve --watch` and verifying environment variables are correctly loaded
+
