@@ -7,12 +7,31 @@
     "rootDir": "./",
     "baseUrl": "./",
     "sourceMap": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
     "paths": {
       "App/*": ["./app/*"],
       "Config/*": ["./config/*"],
       "Contracts/*": ["./contracts/*"],
-      "Database/*": ["./database/*"]
+      "Database/*": ["./database/*"],
+      "Services/*": ["./app/Services/*"],
+      "Models/*": ["./app/Models/*"],
+      "Controllers/*": ["./app/Controllers/*"],
+      "Middleware/*": ["./app/Middleware/*"],
+      "Validators/*": ["./app/Validators/*"],
+      "Exceptions/*": ["./app/Exceptions/*"]
     },
-    "types": ["@adonisjs/core", "@adonisjs/repl", "@japa/preset-adonis/build/adonis-typings"]
+    "types": [
+      "@adonisjs/core",
+      "@adonisjs/repl",
+      "@japa/preset-adonis/build/adonis-typings",
+      "@types/node"
+    ]
   }
 }
